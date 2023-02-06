@@ -42,23 +42,28 @@ class MainWindow(QMainWindow):
         self.init_ui()
         self.init_layout()
         self.init_menu()
+        self.init_buttons()
         self.init_plotting()
 
     def init_ui(self):
         self.setWindowTitle('LibertyViewer')
         self.resize(1200, 600)
         self.corners_filters=['pg', 'dlvl', 'ulvl']
-        #
+        # ui
         self.filepath_label = QLabel('Current filepath : None', self)
         self.dirpath_label = QLabel('Current dirpath : None', self)
-        #
-        self.cells_list = QListWidget(self)
-        self.cells_button = QPushButton('Select Cells')
-        #
+        # corners
         self.corners_tabs = QTabWidget(self)
         self.corners_list = QListWidget(self)
-        self.corners_button = QPushButton('Select Corners')
-        #
+        self.corners_select = QPushButton('Select')
+        self.corners_select_all = QPushButton('Select All')
+        self.corners_clear_all = QPushButton('Clear All')
+        # cells
+        self.cells_list = QListWidget(self)
+        self.cells_select = QPushButton('Select')
+        self.cells_select_all = QPushButton('Select All')
+        self.cells_clear_all = QPushButton('Clear All')
+        # plotting
         self.plotting = pg.PlotWidget(self)
         
     def init_layout(self):
@@ -67,7 +72,9 @@ class MainWindow(QMainWindow):
         corners_v.addWidget(self.corners_tabs)
         self.corners_tabs.setTabPosition(QTabWidget.North)
         self.corners_tabs.setMovable(False)
-        corners_v.addWidget(self.corners_button)
+        corners_v.addWidget(self.corners_select)
+        corners_v.addWidget(self.corners_select_all)
+        corners_v.addWidget(self.corners_clear_all)
         corners_v_w = QWidget()
         corners_v_w.setLayout(corners_v)
         corners_v_w.setFixedWidth(260)
@@ -75,7 +82,9 @@ class MainWindow(QMainWindow):
         # cells
         cells_v = QVBoxLayout()
         cells_v.addWidget(self.cells_list)
-        cells_v.addWidget(self.cells_button)
+        cells_v.addWidget(self.cells_select)
+        cells_v.addWidget(self.cells_select_all)
+        cells_v.addWidget(self.cells_clear_all)
         cells_v_w = QWidget()
         cells_v_w.setLayout(cells_v)
         cells_v_w.setFixedWidth(180)
@@ -122,9 +131,63 @@ class MainWindow(QMainWindow):
         # 'Help'
         help_menu = menu.addMenu('&Help')
 
+    def init_buttons(self):
+        # corners
+        self.corners_select.clicked.connect(self._handle_corners_select_clicked)
+        self.corners_select_all.clicked.connect(self._handle_corners_select_all_clicked)
+        self.corners_clear_all.clicked.connect(self._handle_corners_clear_all_clicked)
+        # cells
+        self.cells_select.clicked.connect(self._handle_cells_select_clicked)
+        self.cells_select_all.clicked.connect(self._handle_cells_select_all_clicked)
+        self.cells_clear_all.clicked.connect(self._handle_cells_clear_all_clicked)
+
     def init_plotting(self):
         self.plotting.setBackground('w')
         self.plotting.showGrid(x=True, y=True)
+
+    def _handle_select_clicked(self, the_list):
+        selected = []
+        for i in range(the_list.count()):
+            if the_list.item(i).checkState() == Qt.Checked:
+                selected.append(the_list.item(i).text())
+        return selected
+
+    def _handle_corners_select_clicked(self):
+        self.now_corners = self._handle_select_clicked(self.corners_tabs.currentWidget())
+        print(f'{len(self.now_corners)} corners selected: \n{self.now_corners}')
+
+    def _handle_cells_select_clicked(self):
+        self.now_cells = self._handle_select_clicked(self.cells_list)
+        print(f'{len(self.now_cells)} cells selected: \n{self.now_cells}')
+
+    def _handle_select_all_clicked(self, the_list):
+        selected = []
+        for i in range(the_list.count()):
+            the_list.item(i).setCheckState(Qt.Checked)
+            selected.append(the_list.item(i).text())
+        return selected
+
+    def _handle_corners_select_all_clicked(self):
+        self.now_corners = self._handle_select_all_clicked(self.corners_tabs.currentWidget())
+        print(f'{len(self.now_corners)} corners selected: \n{self.now_corners}')
+
+    def _handle_cells_select_all_clicked(self):
+        self.now_cells = self._handle_select_all_clicked(self.cells_list)
+        print(f'{len(self.now_cells)} cells selected: \n{self.now_cells}')
+
+    def _handle_clear_all_clicked(self, the_list):
+        selected = []
+        for i in range(the_list.count()):
+            the_list.item(i).setCheckState(Qt.Unchecked)
+        return selected
+
+    def _handle_corners_clear_all_clicked(self):
+        self.now_corners = self._handle_clear_all_clicked(self.corners_tabs.currentWidget())
+        print(f'{len(self.now_corners)} corners selected: \n{self.now_corners}')
+
+    def _handle_cells_clear_all_clicked(self):
+        self.now_cells = self._handle_clear_all_clicked(self.cells_list)
+        print(f'{len(self.now_cells)} cells selected: \n{self.now_cells}')
 
     def _create_checkbox_list(self, the_list, item_names):
         the_list.clear()

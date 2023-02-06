@@ -13,8 +13,10 @@
 import sys
 from PyQt5.QtWidgets import QApplication
 
+sys.path.append('lib')
 sys.path.append('gui')
 from maingui import MainWindow
+
 
 app = QApplication(sys.argv)
 win = MainWindow()
