@@ -25,6 +25,7 @@ import pyqtgraph as pg
 from pyqtgraph import PlotWidget, plot
 
 from liberty import Liberty
+from libertydir import LibertyDir
 
 
 class ListWidgetItemWithCheckbox(QListWidgetItem):
@@ -131,15 +132,9 @@ class MainWindow(QMainWindow):
             item = ListWidgetItemWithCheckbox(name)
             the_list.addItem(item)
 
-    def _create_corners_tabs(self, corners):
-        corners_groups = {}
-        is_selected = []
-        for filtre in self.corners_filters:
-            corners_groups[filtre] = [corner for corner in corners if corner.find(filtre) != -1]
-            if len(corners_groups[filtre]):
-                is_selected.extend(corners_groups[filtre])
-        corners_groups['base'] = [corner for corner in corners if corner not in is_selected]
-        for k, v in corners_groups.items():
+    def _create_corners_tabs(self):
+        self.corners_tabs.clear()
+        for k, v in self.libdir.corners_groups.items():
             corners_list = QListWidget(self)
             self._create_checkbox_list(corners_list, v)
             self.corners_tabs.addTab(corners_list, k)
@@ -153,9 +148,9 @@ class MainWindow(QMainWindow):
             print(f'Loading directory: {dirpath}')
             # update
             self.dirpath_label.setText(f'Current dirpath : {dirpath}')
-            corners = [os.path.basename(fp) for fp in glob.glob(dirpath + '/*.json')]
-            corners = [fn[:fn.find('.')] for fn in corners]
-            self._create_corners_tabs(corners)
+            self.libdir = LibertyDir(dirpath)
+            self._create_corners_tabs()
+            # reset
             self.filepath_label.setText('Current filepath : None')
             self.cells_list.clear()
 
@@ -167,9 +162,10 @@ class MainWindow(QMainWindow):
         )
         if filepath:
             print(f'Loading file: {filepath}')
-            lib = Liberty(filepath=filepath)
             # update
+            self.lib = Liberty(filepath=filepath)
             self.filepath_label.setText(f'Current filepath : {filepath}')
-            self._create_checkbox_list(self.cells_list, lib.list_cells())
+            self._create_checkbox_list(self.cells_list, self.lib.list_cells())
+            # reset
             self.dirpath_label.setText('Current dirpath : None')
             self.corners_tabs.clear()
