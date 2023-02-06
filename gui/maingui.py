@@ -78,7 +78,7 @@ class MainWindow(QMainWindow):
         cells_v.addWidget(self.cells_button)
         cells_v_w = QWidget()
         cells_v_w.setLayout(cells_v)
-        cells_v_w.setFixedWidth(200)
+        cells_v_w.setFixedWidth(180)
 
         # plotting
         plot_v = QVBoxLayout()
