@@ -7,7 +7,7 @@
 # @email: mirkat.ding@gmail.com       #
 # @date created: 2023/2/5             #
 # @last modified by: Shiuan-Yun Ding  #
-# @last modified date: 2023/2/5       #
+# @last modified date: 2023/2/6       #
 # ################################### #
 
 import os
@@ -15,8 +15,8 @@ import sys
 import glob
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
-    QApplication, QMainWindow, 
-    QWidget, QLabel, QPushButton,
+    QApplication, QMainWindow, QWidget, 
+    QLabel, QTabWidget, QPushButton,
     QListWidget, QListWidgetItem,
     QHBoxLayout, QVBoxLayout,
     QFileDialog, QAction,
@@ -39,30 +39,45 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.init_ui()
+        self.init_layout()
         self.init_menu()
         self.init_plotting()
 
     def init_ui(self):
         self.setWindowTitle('LibertyViewer')
+        self.resize(1200, 600)
+        self.corners_filters=['pg', 'dlvl', 'ulvl']
+        #
         self.filepath_label = QLabel('Current filepath : None', self)
         self.dirpath_label = QLabel('Current dirpath : None', self)
+        #
         self.cells_list = QListWidget(self)
-        self.cells_button = QPushButton('Update Cells')
+        self.cells_button = QPushButton('Select Cells')
+        #
+        self.corners_tabs = QTabWidget(self)
         self.corners_list = QListWidget(self)
-        self.corners_button = QPushButton('Update Corners')
-        self.plotting = pg.PlotWidget()
+        self.corners_button = QPushButton('Select Corners')
+        #
+        self.plotting = pg.PlotWidget(self)
         
-        # buttons
-        
+    def init_layout(self):
+        # corners
+        corners_v = QVBoxLayout()
+        corners_v.addWidget(self.corners_tabs)
+        self.corners_tabs.setTabPosition(QTabWidget.North)
+        self.corners_tabs.setMovable(False)
+        corners_v.addWidget(self.corners_button)
+        corners_v_w = QWidget()
+        corners_v_w.setLayout(corners_v)
+        corners_v_w.setFixedWidth(260)
+
         # cells
         cells_v = QVBoxLayout()
         cells_v.addWidget(self.cells_list)
         cells_v.addWidget(self.cells_button)
-
-        # corners
-        corners_v = QVBoxLayout()
-        corners_v.addWidget(self.corners_list)
-        corners_v.addWidget(self.corners_button)
+        cells_v_w = QWidget()
+        cells_v_w.setLayout(cells_v)
+        cells_v_w.setFixedWidth(200)
 
         # plotting
         plot_v = QVBoxLayout()
@@ -70,9 +85,9 @@ class MainWindow(QMainWindow):
 
         # horizontal layout
         ui_h = QHBoxLayout()
-        ui_h.addLayout(cells_v)
+        ui_h.addWidget(corners_v_w)
+        ui_h.addWidget(cells_v_w)
         ui_h.addLayout(plot_v)
-        ui_h.addLayout(corners_v)
 
         # vertical layout
         ui_v = QVBoxLayout()
@@ -97,6 +112,9 @@ class MainWindow(QMainWindow):
         opendirectory_action.triggered.connect(self._open_directory_dialog)
         file_menu.addAction(opendirectory_action)
 
+        # 'Setting'
+        setting_menu = menu.addMenu('&Setting')
+
         # 'Plot'
         plot_menu = menu.addMenu('&Plot')
 
@@ -108,9 +126,23 @@ class MainWindow(QMainWindow):
         self.plotting.showGrid(x=True, y=True)
 
     def _create_checkbox_list(self, the_list, item_names):
+        the_list.clear()
         for name in item_names:
             item = ListWidgetItemWithCheckbox(name)
             the_list.addItem(item)
+
+    def _create_corners_tabs(self, corners):
+        corners_groups = {}
+        is_selected = []
+        for filtre in self.corners_filters:
+            corners_groups[filtre] = [corner for corner in corners if corner.find(filtre) != -1]
+            if len(corners_groups[filtre]):
+                is_selected.extend(corners_groups[filtre])
+        corners_groups['base'] = [corner for corner in corners if corner not in is_selected]
+        for k, v in corners_groups.items():
+            corners_list = QListWidget(self)
+            self._create_checkbox_list(corners_list, v)
+            self.corners_tabs.addTab(corners_list, k)
 
     def _open_directory_dialog(self):
         dirpath = QFileDialog.getExistingDirectory(
@@ -123,7 +155,9 @@ class MainWindow(QMainWindow):
             self.dirpath_label.setText(f'Current dirpath : {dirpath}')
             corners = [os.path.basename(fp) for fp in glob.glob(dirpath + '/*.json')]
             corners = [fn[:fn.find('.')] for fn in corners]
-            self._create_checkbox_list(self.corners_list, corners)
+            self._create_corners_tabs(corners)
+            self.filepath_label.setText('Current filepath : None')
+            self.cells_list.clear()
 
     def _open_file_dialog(self):
         filepath, _ = QFileDialog.getOpenFileName(
@@ -133,7 +167,9 @@ class MainWindow(QMainWindow):
         )
         if filepath:
             print(f'Loading file: {filepath}')
-            self.lib = Liberty(filepath=filepath)
+            lib = Liberty(filepath=filepath)
             # update
             self.filepath_label.setText(f'Current filepath : {filepath}')
-            self._create_checkbox_list(self.cells_list, self.lib.list_cells())
+            self._create_checkbox_list(self.cells_list, lib.list_cells())
+            self.dirpath_label.setText('Current dirpath : None')
+            self.corners_tabs.clear()
