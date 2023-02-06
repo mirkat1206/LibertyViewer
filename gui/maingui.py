@@ -134,10 +134,15 @@ class MainWindow(QMainWindow):
 
     def _create_corners_tabs(self):
         self.corners_tabs.clear()
-        for k, v in self.libdir.corners_groups.items():
+        for k, v in self.libdir.corners_by_groups.items():
             corners_list = QListWidget(self)
             self._create_checkbox_list(corners_list, v)
             self.corners_tabs.addTab(corners_list, k)
+        self.corners_tabs.tabBarClicked.connect(self._handle_corners_tabs_clicked)
+
+    def _handle_corners_tabs_clicked(self, index):
+        filtre = self.corners_tabs.tabText(index)
+        self._create_checkbox_list(self.cells_list, self.libdir.cells_by_groups[filtre])
 
     def _open_directory_dialog(self):
         dirpath = QFileDialog.getExistingDirectory(
