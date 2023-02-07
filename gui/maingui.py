@@ -7,7 +7,7 @@
 # @email: mirkat.ding@gmail.com       #
 # @date created: 2023/2/5             #
 # @last modified by: Shiuan-Yun Ding  #
-# @last modified date: 2023/2/6       #
+# @last modified date: 2023/2/7       #
 # ################################### #
 
 import os
@@ -48,27 +48,29 @@ class MainWindow(QMainWindow):
     def init_ui(self):
         self.setWindowTitle('LibertyViewer')
         self.resize(1200, 600)
-        self.corners_filters=['pg', 'dlvl', 'ulvl']
-        # ui
-        self.filepath_label = QLabel('Current filepath : None', self)
-        self.dirpath_label = QLabel('Current dirpath : None', self)
         # corners
-        self.corners_tabs = QTabWidget(self)
-        self.corners_list = QListWidget(self)
+        self.corners_title = QLabel('Corners')
+        self.corners_tabs = QTabWidget()
+        self.corners_list = QListWidget()
         self.corners_select = QPushButton('Select')
         self.corners_select_all = QPushButton('Select All')
         self.corners_clear_all = QPushButton('Clear All')
         # cells
-        self.cells_list = QListWidget(self)
+        self.cells_title = QLabel('Cells')
+        self.cells_list = QListWidget()
         self.cells_select = QPushButton('Select')
         self.cells_select_all = QPushButton('Select All')
         self.cells_clear_all = QPushButton('Clear All')
         # plotting
-        self.plotting = pg.PlotWidget(self)
+        self.plotting_title = QLabel('Plot')
+        self.plotting = pg.PlotWidget()
         
     def init_layout(self):
         # corners
         corners_v = QVBoxLayout()
+        corners_v.setContentsMargins(0, 0, 0, 0)
+        corners_v.addWidget(self.corners_title)
+        self.corners_title.setStyleSheet('font: bold')
         corners_v.addWidget(self.corners_tabs)
         self.corners_tabs.setTabPosition(QTabWidget.North)
         self.corners_tabs.setMovable(False)
@@ -81,6 +83,9 @@ class MainWindow(QMainWindow):
 
         # cells
         cells_v = QVBoxLayout()
+        cells_v.setContentsMargins(0, 0, 0, 0)
+        cells_v.addWidget(self.cells_title)
+        self.cells_title.setStyleSheet('font: bold')
         cells_v.addWidget(self.cells_list)
         cells_v.addWidget(self.cells_select)
         cells_v.addWidget(self.cells_select_all)
@@ -92,17 +97,17 @@ class MainWindow(QMainWindow):
         # plotting
         plot_v = QVBoxLayout()
         plot_v.addWidget(self.plotting)
+        plot_v_w = QWidget()
+        plot_v_w.setLayout(plot_v)
 
         # horizontal layout
         ui_h = QHBoxLayout()
         ui_h.addWidget(corners_v_w)
         ui_h.addWidget(cells_v_w)
-        ui_h.addLayout(plot_v)
+        ui_h.addWidget(plot_v_w)
 
         # vertical layout
         ui_v = QVBoxLayout()
-        ui_v.addWidget(self.filepath_label)
-        ui_v.addWidget(self.dirpath_label)
         ui_v.addLayout(ui_h)
 
         #
@@ -215,11 +220,10 @@ class MainWindow(QMainWindow):
         if dirpath:
             print(f'Loading directory: {dirpath}')
             # update
-            self.dirpath_label.setText(f'Current dirpath : {dirpath}')
+            self.setWindowTitle(f'LibertyViewer : {dirpath}')
             self.libdir = LibertyDir(dirpath)
             self._create_corners_tabs()
             # reset
-            self.filepath_label.setText('Current filepath : None')
             self.cells_list.clear()
 
     def _open_file_dialog(self):
@@ -231,9 +235,8 @@ class MainWindow(QMainWindow):
         if filepath:
             print(f'Loading file: {filepath}')
             # update
+            self.setWindowTitle(f'LibertyViewer : {filepath}')
             self.lib = Liberty(filepath=filepath)
-            self.filepath_label.setText(f'Current filepath : {filepath}')
             self._create_checkbox_list(self.cells_list, self.lib.list_cells())
             # reset
-            self.dirpath_label.setText('Current dirpath : None')
             self.corners_tabs.clear()
