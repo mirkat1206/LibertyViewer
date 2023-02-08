@@ -7,12 +7,10 @@
 # @email: mirkat.ding@gmail.com       #
 # @date created: 2023/2/5             #
 # @last modified by: Shiuan-Yun Ding  #
-# @last modified date: 2023/2/7       #
+# @last modified date: 2023/2/8       #
 # ################################### #
 
-import os
 import sys
-import glob
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, 
@@ -21,11 +19,9 @@ from PyQt5.QtWidgets import (
     QHBoxLayout, QVBoxLayout,
     QFileDialog, QAction,
 )
-import pyqtgraph as pg
-from pyqtgraph import PlotWidget, plot
 
-from liberty import Liberty
-from libertydir import LibertyDir
+from lib import *
+from plotting import *
 
 
 class ListWidgetItemWithCheckbox(QListWidgetItem):
@@ -43,7 +39,6 @@ class MainWindow(QMainWindow):
         self.init_layout()
         self.init_menu()
         self.init_buttons()
-        self.init_plotting()
 
     def init_ui(self):
         self.setWindowTitle('LibertyViewer')
@@ -62,8 +57,7 @@ class MainWindow(QMainWindow):
         self.cells_select_all = QPushButton('Select All')
         self.cells_clear_all = QPushButton('Clear All')
         # plotting
-        self.plotting_title = QLabel('Plot')
-        self.plotting = pg.PlotWidget()
+        self.plot_w = PlotDefault()
         
     def init_layout(self):
         # corners
@@ -94,17 +88,11 @@ class MainWindow(QMainWindow):
         cells_v_w.setLayout(cells_v)
         cells_v_w.setFixedWidth(180)
 
-        # plotting
-        plot_v = QVBoxLayout()
-        plot_v.addWidget(self.plotting)
-        plot_v_w = QWidget()
-        plot_v_w.setLayout(plot_v)
-
         # horizontal layout
         ui_h = QHBoxLayout()
         ui_h.addWidget(corners_v_w)
         ui_h.addWidget(cells_v_w)
-        ui_h.addWidget(plot_v_w)
+        ui_h.addWidget(self.plot_w)
 
         # vertical layout
         ui_v = QVBoxLayout()
@@ -132,6 +120,9 @@ class MainWindow(QMainWindow):
 
         # 'Plot'
         plot_menu = menu.addMenu('&Plot')
+        plottiming_action = QAction('Timing', self)
+        plottiming_action.triggered.connect(self._plot)
+        plot_menu.addAction(plottiming_action)
 
         # 'Help'
         help_menu = menu.addMenu('&Help')
@@ -146,9 +137,8 @@ class MainWindow(QMainWindow):
         self.cells_select_all.clicked.connect(self._handle_cells_select_all_clicked)
         self.cells_clear_all.clicked.connect(self._handle_cells_clear_all_clicked)
 
-    def init_plotting(self):
-        self.plotting.setBackground('w')
-        self.plotting.showGrid(x=True, y=True)
+    def _plot(self):
+        pass
 
     def _handle_select_clicked(self, the_list):
         selected = []
@@ -240,3 +230,9 @@ class MainWindow(QMainWindow):
             self._create_checkbox_list(self.cells_list, self.lib.list_cells())
             # reset
             self.corners_tabs.clear()
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    win = MainWindow()
+    win.show()
+    sys.exit(app.exec())            

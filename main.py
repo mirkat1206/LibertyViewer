@@ -7,15 +7,13 @@
 # @email: mirkat.ding@gmail.com       #
 # @date created: 2023/2/5             #
 # @last modified by: Shiuan-Yun Ding  #
-# @last modified date: 2023/2/5       #
+# @last modified date: 2023/2/8       #
 # ################################### #
 
 import sys
 from PyQt5.QtWidgets import QApplication
 
-sys.path.append('lib')
-sys.path.append('gui')
-from maingui import MainWindow
+from gui.maingui import MainWindow
 
 
 app = QApplication(sys.argv)

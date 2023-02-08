@@ -7,13 +7,13 @@
 # @email: mirkat.ding@gmail.com       #
 # @date created: 2023/2/6             #
 # @last modified by: Shiuan-Yun Ding  #
-# @last modified date: 2023/2/6       #
+# @last modified date: 2023/2/8       #
 # ################################### #
 
 import os
 import glob
 
-from liberty import Liberty
+from lib import *
 
 
 class LibertyDir():
@@ -23,8 +23,14 @@ class LibertyDir():
         self.corners_filters = corners_filters
         self.corners_by_groups = {}
         self.cells_by_groups = {}
-        #
-        filepaths = glob.glob(dirpath + '/*.json')
+        # for plotting
+        self.now_corners = []
+        self.now_cells = []
+
+        self.init()
+    
+    def init(self):
+        filepaths = glob.glob(self.dirpath + '/*.json')
         corners = [os.path.basename(fp) for fp in filepaths]
         corners = [fn[:fn.find('.')] for fn in corners]
         self.corners = corners
