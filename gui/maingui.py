@@ -17,8 +17,9 @@ from PyQt5.QtWidgets import (
     QLabel, QTabWidget, QPushButton,
     QListWidget, QListWidgetItem,
     QHBoxLayout, QVBoxLayout,
-    QFileDialog, QAction,
+    QFileDialog, QAction
 )
+from PyQt5.QtGui import QIcon
 
 from lib import *
 from plotting import *
@@ -42,6 +43,7 @@ class MainWindow(QMainWindow):
 
     def init_ui(self):
         self.setWindowTitle('LibertyViewer')
+        self.setWindowIcon(QIcon('./image/taiwan_black_bear.png'))
         self.resize(1200, 600)
         # corners
         self.corners_title = QLabel('Corners')
