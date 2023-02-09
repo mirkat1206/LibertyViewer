@@ -7,7 +7,7 @@
 # @email: mirkat.ding@gmail.com       #
 # @date created: 2023/2/8             #
 # @last modified by: Shiuan-Yun Ding  #
-# @last modified date: 2023/2/8       #
+# @last modified date: 2023/2/9       #
 # ################################### #
 
 from random import randint
@@ -37,7 +37,6 @@ class PlotDefault(QWidget):
         # control panel
         self.control_title = QLabel('Plot Control Panel')
         self.control_list = QListWidget()
-        self.control_plot = QPushButton('Plot')
         self.control_autorange = QPushButton('Auto Range')
 
     def init_layout(self):
@@ -47,7 +46,6 @@ class PlotDefault(QWidget):
         control_v.addWidget(self.control_title)
         self.control_title.setStyleSheet('font: bold')
         control_v.addWidget(self.control_list)
-        control_v.addWidget(self.control_plot)
         control_v.addWidget(self.control_autorange)
         control_v_w = QWidget()
         control_v_w.setLayout(control_v)
@@ -65,7 +63,7 @@ class PlotDefault(QWidget):
             'scatter plot',
             'line plot'
         ])
-        self.control_plot.clicked.connect(self._handle_control_plot_clicked)
+        self.control_list.currentTextChanged.connect(self._handle_control_plot_clicked)
         self.control_autorange.clicked.connect(self._handle_control_autorange_clicked)
 
     def _handle_control_autorange_clicked(self):
