@@ -7,7 +7,7 @@
 # @email: mirkat.ding@gmail.com       #
 # @date created: 2023/2/6             #
 # @last modified by: Shiuan-Yun Ding  #
-# @last modified date: 2023/2/8       #
+# @last modified date: 2023/2/13      #
 # ################################### #
 
 import os
@@ -24,8 +24,8 @@ class LibertyDir():
         self.corners_by_groups = {}
         self.cells_by_groups = {}
         # for plotting
-        self.now_corners = []
-        self.now_cells = []
+        self.selected_corners = []
+        self.selected_cells = []
 
         self.init()
     

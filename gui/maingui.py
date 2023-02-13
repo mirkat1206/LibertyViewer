@@ -7,7 +7,7 @@
 # @email: mirkat.ding@gmail.com       #
 # @date created: 2023/2/5             #
 # @last modified by: Shiuan-Yun Ding  #
-# @last modified date: 2023/2/8       #
+# @last modified date: 2023/2/13      #
 # ################################### #
 
 import sys
@@ -40,6 +40,7 @@ class MainWindow(QMainWindow):
         self.init_layout()
         self.init_menu()
         self.init_buttons()
+        self.libdir = None
 
     def init_ui(self):
         self.setWindowTitle('LibertyViewer')
@@ -179,12 +180,12 @@ class MainWindow(QMainWindow):
         return selected
 
     def _handle_corners_clear_all_clicked(self):
-        self.now_corners = self._handle_clear_all_clicked(self.corners_tabs.currentWidget())
-        print(f'{len(self.now_corners)} corners selected: \n{self.now_corners}')
+        self.libdir.selected_corners = self._handle_clear_all_clicked(self.corners_tabs.currentWidget())
+        print(f'{len(self.now_corners)} corners selected: \n{self.libdir.selected_corners}')
 
     def _handle_cells_clear_all_clicked(self):
-        self.now_cells = self._handle_clear_all_clicked(self.cells_list)
-        print(f'{len(self.now_cells)} cells selected: \n{self.now_cells}')
+        self.libdir.selected_cells = self._handle_clear_all_clicked(self.cells_list)
+        print(f'{len(self.now_cells)} cells selected: \n{self.libdir.selected_cells}')
 
     def _create_checkbox_list(self, the_list, item_names):
         the_list.clear()
