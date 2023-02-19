@@ -7,7 +7,7 @@
 # @email: mirkat.ding@gmail.com       #
 # @date created: 2023/2/5             #
 # @last modified by: Shiuan-Yun Ding  #
-# @last modified date: 2023/2/13      #
+# @last modified date: 2023/2/19      #
 # ################################### #
 
 import sys
@@ -41,6 +41,8 @@ class MainWindow(QMainWindow):
         self.init_menu()
         self.init_buttons()
         self.libdir = None
+        self.selected_corners = []
+        self.selected_cellnames = []
 
     def init_ui(self):
         self.setWindowTitle('LibertyViewer')
@@ -61,6 +63,7 @@ class MainWindow(QMainWindow):
         self.cells_clear_all = QPushButton('Clear All')
         # plotting
         self.plot_w = PlotDefault()
+        # self.plot_w = PlotCellTiming()
         
     def init_layout(self):
         # corners
@@ -124,7 +127,7 @@ class MainWindow(QMainWindow):
         # 'Plot'
         plot_menu = menu.addMenu('&Plot')
         plottiming_action = QAction('Timing', self)
-        plottiming_action.triggered.connect(self._plot)
+        # plottiming_action.triggered.connect(self._plot_update)
         plot_menu.addAction(plottiming_action)
 
         # 'Help'
@@ -139,9 +142,16 @@ class MainWindow(QMainWindow):
         self.cells_select.clicked.connect(self._handle_cells_select_clicked)
         self.cells_select_all.clicked.connect(self._handle_cells_select_all_clicked)
         self.cells_clear_all.clicked.connect(self._handle_cells_clear_all_clicked)
+        #
+        self.corners_select.clicked.connect(self._plot_update)
+        self.corners_select_all.clicked.connect(self._plot_update)
+        self.corners_clear_all.clicked.connect(self._plot_update)
+        self.cells_select.clicked.connect(self._plot_update)
+        self.cells_select_all.clicked.connect(self._plot_update)
+        self.cells_clear_all.clicked.connect(self._plot_update)
 
-    def _plot(self):
-        pass
+    def _plot_update(self):
+        self.plot_w.update()
 
     def _handle_select_clicked(self, the_list):
         selected = []
@@ -151,12 +161,12 @@ class MainWindow(QMainWindow):
         return selected
 
     def _handle_corners_select_clicked(self):
-        self.now_corners = self._handle_select_clicked(self.corners_tabs.currentWidget())
-        print(f'{len(self.now_corners)} corners selected: \n{self.now_corners}')
+        self.selected_corners = self._handle_select_clicked(self.corners_tabs.currentWidget())
+        print(f'{len(self.selected_corners)} corners selected: \n{self.selected_corners}')
 
     def _handle_cells_select_clicked(self):
-        self.now_cells = self._handle_select_clicked(self.cells_list)
-        print(f'{len(self.now_cells)} cells selected: \n{self.now_cells}')
+        self.selected_cellnames = self._handle_select_clicked(self.cells_list)
+        print(f'{len(self.selected_cellnames)} cells selected: \n{self.selected_cellnames}')
 
     def _handle_select_all_clicked(self, the_list):
         selected = []
@@ -166,12 +176,12 @@ class MainWindow(QMainWindow):
         return selected
 
     def _handle_corners_select_all_clicked(self):
-        self.now_corners = self._handle_select_all_clicked(self.corners_tabs.currentWidget())
-        print(f'{len(self.now_corners)} corners selected: \n{self.now_corners}')
+        self.selected_corners = self._handle_select_all_clicked(self.corners_tabs.currentWidget())
+        print(f'{len(self.selected_corners)} corners selected: \n{self.selected_corners}')
 
     def _handle_cells_select_all_clicked(self):
-        self.now_cells = self._handle_select_all_clicked(self.cells_list)
-        print(f'{len(self.now_cells)} cells selected: \n{self.now_cells}')
+        self.selected_cellnames = self._handle_select_all_clicked(self.cells_list)
+        print(f'{len(self.selected_cellnames)} cells selected: \n{self.selected_cellnames}')
 
     def _handle_clear_all_clicked(self, the_list):
         selected = []
@@ -180,12 +190,12 @@ class MainWindow(QMainWindow):
         return selected
 
     def _handle_corners_clear_all_clicked(self):
-        self.libdir.selected_corners = self._handle_clear_all_clicked(self.corners_tabs.currentWidget())
-        print(f'{len(self.now_corners)} corners selected: \n{self.libdir.selected_corners}')
+        self.selected_corners = self._handle_clear_all_clicked(self.corners_tabs.currentWidget())
+        print(f'{len( self.selected_corners)} corners selected: \n{self.selected_corners}')
 
     def _handle_cells_clear_all_clicked(self):
-        self.libdir.selected_cells = self._handle_clear_all_clicked(self.cells_list)
-        print(f'{len(self.now_cells)} cells selected: \n{self.libdir.selected_cells}')
+        self.selected_cellnames = self._handle_clear_all_clicked(self.cells_list)
+        print(f'{len(self.selected_cellnames)} cells selected: \n{self.selected_cellnames}')
 
     def _create_checkbox_list(self, the_list, item_names):
         the_list.clear()
@@ -215,9 +225,12 @@ class MainWindow(QMainWindow):
             # update
             self.setWindowTitle(f'LibertyViewer : {dirpath}')
             self.libdir = LibertyDir(dirpath)
+            if dirpath == '.':
+                self.libdir.update()
             self._create_corners_tabs()
             # reset
             self.cells_list.clear()
+            self._handle_corners_tabs_clicked(0)
 
     def _open_file_dialog(self):
         filepath, _ = QFileDialog.getOpenFileName(

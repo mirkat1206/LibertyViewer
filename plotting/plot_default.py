@@ -7,7 +7,7 @@
 # @email: mirkat.ding@gmail.com       #
 # @date created: 2023/2/8             #
 # @last modified by: Shiuan-Yun Ding  #
-# @last modified date: 2023/2/13      #
+# @last modified date: 2023/2/19      #
 # ################################### #
 
 from random import randint
@@ -29,6 +29,9 @@ class PlotDefault(QWidget):
         self.init_control_panel()
         self.maxn = 10
         self.type = None
+
+    def update(self):
+        pass
 
     def init_ui(self):
         # plotting
