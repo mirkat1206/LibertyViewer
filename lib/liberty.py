@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 # ################################### #
 # File: liberty.py                    #
-# Version: 1.0                        #
+# Version: 0.0.1                      #
 # @author: Shiuan-Yun Ding            #
 # @email: mirkat.ding@gmail.com       #
 # @date created: 2023/1/4             #
@@ -24,7 +24,7 @@ class Group():
 
     def get_attribute(self, attr=''):
         return self.content[attr]
-    
+
     def get_attributes(self, attrs=[]):
         if attrs == []:
             attrs = self.list_attributes()
@@ -58,7 +58,7 @@ class Cell(Group):
 
     def get_input_pins(self):
         return self.get_pins(self.list_input_pins())
-    
+
     def list_output_pins(self):
         return [k for k, v in self.content['pin'].items() if v['direction'] == 'output']
 
@@ -70,13 +70,13 @@ class Cell(Group):
 
     def get_inout_pins(self):
         return self.get_pins(self.list_inout_pins())
-    
+
 
 class Liberty(Group):
     def __init__(self, filepath=''):
         if filepath != '' and os.path.exists(filepath) == False:
             raise AssertionError(f'Error: {filepath} does not exist')
-        
+
         self.filepath = filepath
         if self.filepath != '':
             self.read(filepath)

@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 # ################################### #
 # File: plot_cell_timing.py           #
-# Version: 1.0                        #
+# Version: 0.0.1                      #
 # @author: Shiuan-Yun Ding            #
 # @email: mirkat.ding@gmail.com       #
 # @date created: 2023/2/13            #
