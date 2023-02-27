@@ -63,13 +63,13 @@ class Cell(Group):
         return [k for k, v in self.content['pin'].items() if v['direction'] == 'output']
 
     def get_output_pins(self):
-        return self.get_pins(self.list_input_pins())
+        return self.get_pins(self.list_output_pins())
 
     def list_inout_pins(self):
         return [k for k, v in self.content['pin'].items() if v['direction'] == 'inout']
 
     def get_inout_pins(self):
-        return self.get_pins(self.list_input_pins())
+        return self.get_pins(self.list_inout_pins())
     
 
 class Liberty(Group):
