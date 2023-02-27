@@ -7,7 +7,7 @@
 # @email: mirkat.ding@gmail.com       #
 # @date created: 2023/2/5             #
 # @last modified by: Shiuan-Yun Ding  #
-# @last modified date: 2023/2/19      #
+# @last modified date: 2023/2/22      #
 # ################################### #
 
 import sys
@@ -40,6 +40,7 @@ class MainWindow(QMainWindow):
         self.init_layout()
         self.init_menu()
         self.init_buttons()
+        self.lib = None
         self.libdir = None
         self.selected_corners = []
         self.selected_cellnames = []
@@ -63,7 +64,6 @@ class MainWindow(QMainWindow):
         self.cells_clear_all = QPushButton('Clear All')
         # plotting
         self.plot_w = PlotDefault()
-        # self.plot_w = PlotCellTiming()
         
     def init_layout(self):
         # corners
@@ -126,12 +126,25 @@ class MainWindow(QMainWindow):
 
         # 'Plot'
         plot_menu = menu.addMenu('&Plot')
+        plotdefault_action = QAction('Default', self)
+        plotdefault_action.triggered.connect(self._plot_default)
+        plot_menu.addAction(plotdefault_action)
         plottiming_action = QAction('Timing', self)
-        # plottiming_action.triggered.connect(self._plot_update)
+        plottiming_action.triggered.connect(self._plot_cell_timing)
         plot_menu.addAction(plottiming_action)
 
         # 'Help'
         help_menu = menu.addMenu('&Help')
+    
+    def _plot_default(self):
+        print('Switch to default plot')
+        self.plot_w = PlotDefault()
+        self.init_layout()
+
+    def _plot_cell_timing(self):
+        print('Switch to cell timing plot')
+        self.plot_w = PlotCellTiming()
+        self.init_layout()
 
     def init_buttons(self):
         # corners
@@ -151,7 +164,12 @@ class MainWindow(QMainWindow):
         self.cells_clear_all.clicked.connect(self._plot_update)
 
     def _plot_update(self):
-        self.plot_w.update()
+        self.plot_w.update(
+            lib=self.lib,
+            libdir=self.libdir,
+            cellnames=self.selected_cellnames, 
+            corners=self.selected_corners
+        )
 
     def _handle_select_clicked(self, the_list):
         selected = []

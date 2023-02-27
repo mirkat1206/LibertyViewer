@@ -30,8 +30,8 @@ class PlotDefault(QWidget):
         self.maxn = 10
         self.type = None
 
-    def update(self):
-        pass
+    def update(self, **kwargs):
+        print(kwargs)
 
     def init_ui(self):
         # plotting
